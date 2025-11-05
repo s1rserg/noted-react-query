@@ -13,8 +13,8 @@ interface TaskListProps {
   tasks: Task[];
   viewMode: ViewModeValues;
   onEditTask: (task: Task) => void;
-  onCompleteTask: (id: Task['id']) => Promise<void>;
-  onDeleteTask: (id: Task['id']) => Promise<void>;
+  onCompleteTask: (id: Task['id']) => void;
+  onDeleteTask: (id: Task['id']) => void;
   isLoading: boolean;
 }
 

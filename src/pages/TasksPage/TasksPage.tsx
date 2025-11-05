@@ -1,46 +1,35 @@
 import { Box } from '@mui/material';
-import { toast } from 'react-toastify';
 import { useLocalStorage, useModal } from 'hooks';
 import { useSearchParams } from 'react-router-dom';
-import { type FC, useCallback, useEffect, useState } from 'react';
-import { TaskStatus, type Task } from 'types/task';
+import { type FC, useState } from 'react';
+import { type Task } from 'types/task';
 import { ControlHeader, TaskFormModal, TaskList } from './components';
 import { ViewMode, type ViewModeValues } from './types';
-import { useTranslation } from 'react-i18next';
-import { handleApiError, httpClient, taskApiService, type CreateTaskDto } from 'api';
-import { getQueryParameters } from './helpers/getQueryParams';
+import { type CreateTaskDto } from 'api';
 import type { Nullable } from 'types/utils';
+import {
+  useCreateTask,
+  useUpdateTask,
+  useDeleteTask,
+  useCompleteTask,
+  useGetAllTasks,
+} from './hooks';
 
 const TasksPage: FC = () => {
-  const { t } = useTranslation('tasksPage');
   const [viewMode, setViewMode] = useLocalStorage<ViewModeValues>('taskViewMode', ViewMode.GRID);
   const [searchParams] = useSearchParams();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, isLoading } = useGetAllTasks(searchParams);
+
+  const { mutate: createTask, isPending: isCreating } = useCreateTask();
+  const { mutate: updateTask, isPending: isUpdating } = useUpdateTask();
+  const { mutate: deleteTask } = useDeleteTask();
+  const { mutate: completeTask } = useCompleteTask();
+
   const [isHeaderOpen, setIsHeaderOpen] = useState(true);
 
   const { isOpen, openModal, closeModal } = useModal();
-  const [isFormLoading, setIsFormLoading] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Nullable<Task>>(null);
-
-  const fetchTasks = useCallback(
-    async (signal?: AbortSignal) => {
-      setIsLoading(true);
-
-      try {
-        const requestConfig = taskApiService.findAll(getQueryParameters(searchParams), signal);
-        const response = await httpClient<Task[]>(requestConfig);
-
-        setTasks(response.data);
-      } catch (error) {
-        handleApiError(error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [searchParams],
-  );
 
   const handleToggleHeader = () => {
     setIsHeaderOpen((prev) => !prev);
@@ -60,59 +49,21 @@ const TasksPage: FC = () => {
     openModal();
   };
 
-  const handleFormSubmit = async (taskData: CreateTaskDto) => {
-    setIsFormLoading(true);
-    try {
-      if (taskToEdit) {
-        await httpClient(taskApiService.update(taskToEdit.id, taskData));
-        toast.success(t('edit.successMsg'));
-      } else {
-        await httpClient(taskApiService.create(taskData));
-        toast.success(t('add.successMsg'));
-      }
-      closeModal();
-      void fetchTasks();
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsFormLoading(false);
+  const handleFormSubmit = (taskData: CreateTaskDto) => {
+    if (taskToEdit) {
+      updateTask({ id: taskToEdit.id, data: taskData }, { onSuccess: () => closeModal() });
+    } else {
+      createTask(taskData, { onSuccess: () => closeModal() });
     }
   };
 
-  const handleCompleteTask = useCallback(
-    async (id: Task['id']) => {
-      try {
-        await httpClient(taskApiService.update(id, { status: TaskStatus.COMPLETED }));
-        toast.success(t('complete.successMsg'));
-        void fetchTasks();
-      } catch (error) {
-        handleApiError(error);
-      }
-    },
-    [fetchTasks, t],
-  );
+  const handleCompleteTask = (id: Task['id']) => {
+    completeTask(id);
+  };
 
-  const handleDeleteTask = useCallback(
-    async (id: Task['id']) => {
-      try {
-        await httpClient(taskApiService.delete(id));
-        toast.success(t('delete.successMsg'));
-        void fetchTasks(); //NOTE: needed for pagination later
-      } catch (error) {
-        handleApiError(error);
-      }
-    },
-    [fetchTasks, t],
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchTasks(controller.signal);
-
-    return () => {
-      controller.abort();
-    };
-  }, [fetchTasks]);
+  const handleDeleteTask = (id: Task['id']) => {
+    deleteTask(id);
+  };
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', gap: 4 }}>
@@ -124,7 +75,7 @@ const TasksPage: FC = () => {
         toggleViewMode={handleToggleViewMode}
       />
       <TaskList
-        tasks={tasks}
+        tasks={tasks ?? []}
         viewMode={viewMode}
         onEditTask={handleOpenEditModal}
         onCompleteTask={handleCompleteTask}
@@ -135,7 +86,7 @@ const TasksPage: FC = () => {
         open={isOpen}
         handleClose={closeModal}
         onSubmit={handleFormSubmit}
-        isLoading={isFormLoading}
+        isLoading={isCreating || isUpdating}
         initialData={taskToEdit}
       />
     </Box>

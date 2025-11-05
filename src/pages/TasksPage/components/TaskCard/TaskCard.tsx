@@ -23,8 +23,8 @@ import { useTranslation } from 'react-i18next';
 interface Props {
   task: Task;
   onEdit: (task: Task) => void;
-  onComplete: (id: Task['id']) => Promise<void>;
-  onDelete: (id: Task['id']) => Promise<void>;
+  onComplete: (id: Task['id']) => void;
+  onDelete: (id: Task['id']) => void;
 }
 
 export const TaskCard: FC<Props> = ({ task, onEdit, onComplete, onDelete }) => {
@@ -104,7 +104,7 @@ export const TaskCard: FC<Props> = ({ task, onEdit, onComplete, onDelete }) => {
       <ConfirmModal
         open={isCompleteModalOpen}
         handleClose={closeCompleteModal}
-        onConfirm={() => void onComplete(task.id)}
+        onConfirm={() => onComplete(task.id)}
         title={t('complete.title')}
         confirmText={t('complete.confirm')}
         cancelText={t('complete.cancel')}
@@ -114,7 +114,7 @@ export const TaskCard: FC<Props> = ({ task, onEdit, onComplete, onDelete }) => {
       <ConfirmModal
         open={isDeleteModalOpen}
         handleClose={closeDeleteModal}
-        onConfirm={() => void onDelete(task.id)}
+        onConfirm={() => onDelete(task.id)}
         title={t('delete.title')}
         confirmText={t('delete.confirm')}
         cancelText={t('delete.cancel')}

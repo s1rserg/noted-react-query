@@ -26,7 +26,7 @@ import type { Nullable } from 'types/utils';
 interface Props {
   open: boolean;
   handleClose: () => void;
-  onSubmit: (taskData: CreateTaskDto) => Promise<void>;
+  onSubmit: (taskData: CreateTaskDto) => void;
   isLoading: boolean;
   initialData?: Nullable<Task>;
 }
@@ -55,13 +55,16 @@ export const TaskFormModal: FC<Props> = ({
   });
 
   const handleFormSubmit = handleSubmit((data: CreateTaskDto) => {
-    void onSubmit(data);
+    onSubmit(data);
   });
 
   useEffect(() => {
     if (open) {
       if (isEditMode) {
-        reset(initialData);
+        reset({
+          ...initialData,
+          deadline: initialData.deadline === null ? '' : initialData.deadline,
+        });
       } else {
         reset(CreateTaskDefaultValues);
       }
