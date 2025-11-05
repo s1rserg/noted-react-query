@@ -1,0 +1,108 @@
+{
+  "header": {
+    "search": {
+      "placeholder": "Search tasks...",
+      "title": "Search"
+    },
+    "collapse": {
+      "show": "Show Controls",
+      "hide": "Hide Controls"
+    },
+    "viewModeSwitch": {
+      "title": "Switch to {{viewMode}} view"
+    },
+    "filterSort": {
+      "title": "Sorting and filters",
+      "reset": "Reset"
+    },
+    "sort": {
+      "title": "Sorting",
+      "field": "Sort by",
+      "asc": "Ascending",
+      "desc": "Descending",
+      "options": {
+        "created_at": "By Creation date",
+        "title": "By Title",
+        "status": "By Status",
+        "priority": "By Priority"
+      }
+    },
+    "filters": {
+      "title": "Filters",
+      "status": "Status",
+      "priority": "Priority"
+    }
+  },
+  "statusOptions": {
+    "all": "All",
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed"
+  },
+  "priorityOptions": {
+    "all": "All",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "task": {
+    "edit": "Edit",
+    "details": "Details",
+    "complete": "Complete",
+    "delete": "Delete",
+    "detailsTitle": "Task Details"
+  },
+  "list": {
+    "emptyMsg": "There are no tasks to show.",
+    "detailsTitle": "Task Details"
+  },
+  "add": {
+    "title": "Add new task",
+    "successMsg": "Task was added successfully.",
+    "labels": {
+      "title": "Title",
+      "description": "Description",
+      "deadline": "Deadline",
+      "status": "Status",
+      "priority": "Priority",
+      "tags": "Tags"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMin": "Title must be at least 3 characters",
+      "descriptionRequired": "Description is required",
+      "descriptionMin": "Description must be at least 5 characters",
+      "deadlinePast": "Deadline cannot be in the past"
+    }
+  },
+  "edit": {
+    "title": "Edit a task",
+    "successMsg": "Task was updated successfully.",
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    }
+  },
+  "complete": {
+    "title": "Confirm Completion",
+    "confirm": "Yes, Complete",
+    "cancel": "Cancel",
+    "description": "Are you sure you want to mark this task as complete?",
+    "successMsg": "Task was completed successfully."
+  },
+  "delete": {
+    "title": "Confirm Deletion",
+    "confirm": "Yes, Delete",
+    "cancel": "No, Keep it",
+    "description": "Are you sure you want to delete this item? This action cannot be undone.",
+    "successMsg": "Task was deleted successfully."
+  },
+  "viewMode": {
+    "list": "list",
+    "grid": "grid"
+  }
+}

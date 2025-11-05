@@ -1,0 +1,12 @@
+{
+  "columnLabels": {
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed"
+  },
+  "priorityLabels": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  }
+}

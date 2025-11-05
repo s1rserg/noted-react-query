@@ -1,0 +1,31 @@
+{
+  "title": "User Profile",
+  "labels": {
+    "email": "Email",
+    "name": "Name",
+    "surname": "Surname",
+    "birthday": "Birthday",
+    "joined": "Joined",
+    "avatar": "Avatar"
+  },
+  "buttons": {
+    "edit": "Edit Profile",
+    "changeAvatar": "Change Avatar"
+  },
+  "modal": {
+    "title": "Upload Avatar"
+  },
+  "slider": {
+    "add": "Add Avatar",
+    "delete": "Delete Avatar",
+    "setMain": "Set as Main Avatar"
+  },
+  "updateModal": {
+    "title": "Edit Profile",
+    "successMsg": "Profile updated successfully!",
+    "buttons": {
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    }
+  }
+}

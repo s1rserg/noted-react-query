@@ -1,0 +1,12 @@
+{
+  "hello": "Привіт",
+  "updateProfile": "Будь ласка, оновіть свій профіль.",
+  "buttons": {
+    "changeLanguage": "Змінити мову на {{lang}}",
+    "theme": "Перемкнути тему",
+    "profile": "Профіль",
+    "logout": "Вийти",
+    "backToTasks": "Назад до завдань",
+    "kanbanView": "Вигляд Канбан"
+  }
+}

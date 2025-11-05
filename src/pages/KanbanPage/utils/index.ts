@@ -1,0 +1,1 @@
+export { mergeSortActivatorProps } from './mergeSortActivatorProps';

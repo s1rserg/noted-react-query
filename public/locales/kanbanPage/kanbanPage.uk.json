@@ -1,0 +1,12 @@
+{
+  "columnLabels": {
+    "pending": "Очікує",
+    "in_progress": "У процесі",
+    "completed": "Завершено"
+  },
+  "priorityLabels": {
+    "low": "Низький",
+    "medium": "Середній",
+    "high": "Високий"
+  }
+}

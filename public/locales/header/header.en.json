@@ -1,0 +1,12 @@
+{
+  "hello": "Hello",
+  "updateProfile": "Please, update your profile.",
+  "buttons": {
+    "changeLanguage": "Change language to {{lang}}",
+    "theme": "Toggle theme",
+    "profile": "Profile",
+    "logout": "Logout",
+    "backToTasks": "Back to Tasks",
+    "kanbanView": "Kanban View"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "step1": {
+    "title": "Create Account",
+    "link": "Already have an account? Sign in.",
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "buttons": {
+      "continue": "Continue"
+    },
+    "successMsg": "Account created successfully!"
+  },
+  "step2": {
+    "title": "Additional Info",
+    "buttons": {
+      "skip": "Skip",
+      "save": "Save"
+    },
+    "successMsg": "Profile updated successfully!"
+  },
+  "validation": {
+    "email": "Email is not valid",
+    "passwordMin": "Min password length is 6",
+    "confirmPasswordRequired": "Confirm password is required",
+    "passwordsDontMatch": "Passwords don't match"
+  },
+  "googleErrorMsg": "Google sign-up failed. Please try again or use another registration method."
+}
