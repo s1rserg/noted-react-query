@@ -6,8 +6,8 @@ import type { Task } from 'types/task';
 interface Props {
   tasks: Task[];
   onEditTask: (task: Task) => void;
-  onCompleteTask: (id: Task['id']) => Promise<void>;
-  onDeleteTask: (id: Task['id']) => Promise<void>;
+  onCompleteTask: (id: Task['id']) => void;
+  onDeleteTask: (id: Task['id']) => void;
 }
 
 export const GridView: FC<Props> = ({ tasks, onEditTask, onCompleteTask, onDeleteTask }) => {

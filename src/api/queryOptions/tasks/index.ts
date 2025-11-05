@@ -1,0 +1,1 @@
+export { getAllTasksQueryOptions } from './getAll';
