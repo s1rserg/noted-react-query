@@ -1,46 +1,15 @@
 import { Box, Card, CardContent, Typography } from '@mui/material';
-import { handleApiError, httpClient, taskApiService } from 'api';
 import { Loader } from 'components/Loader';
-import { type FC, useCallback, useEffect, useState } from 'react';
+import { type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import type { Task } from 'types/task';
-import type { Nullable } from 'types/utils';
+import { useGetOneTask } from './hooks';
 
 export const TaskDetailsPage: FC = () => {
   const { t } = useTranslation('taskDetailsPage');
-
   const { id } = useParams<{ id: string }>();
 
-  const [task, setTask] = useState<Nullable<Task>>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchTask = useCallback(
-    async (signal?: AbortSignal) => {
-      if (!id) return;
-      setIsLoading(true);
-
-      try {
-        const requestConfig = taskApiService.findOne(id, signal);
-        const response = await httpClient<Task>(requestConfig);
-        setTask(response.data);
-      } catch (error) {
-        handleApiError(error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [id],
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchTask(controller.signal);
-
-    return () => {
-      controller.abort();
-    };
-  }, [fetchTask]);
+  const { task, isLoading } = useGetOneTask(id || '');
 
   if (isLoading) {
     return <Loader />;
