@@ -1,11 +1,5 @@
-import { useState, type FC } from 'react';
-import {
-  httpClient,
-  authApiService,
-  type AuthResponse,
-  type SignInLocalDto,
-  handleApiError,
-} from 'api';
+import { type FC } from 'react';
+import { type SignInLocalDto } from 'api';
 import { localStorageService } from 'utils/LocalStorageService';
 import { LoginForm } from './components';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -15,56 +9,43 @@ import { Box, Divider } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { GoogleAuthButton } from 'components/GoogleAuthButton';
+import { useSignInMutation } from './hooks';
+import { useGoogleAuthMutation } from 'hooks';
+import type { Nullable } from 'types/utils';
 
 export const LoginPage: FC = () => {
   const navigate = useNavigate();
-
   const location = useLocation();
-
   const { t } = useTranslation('loginPage');
 
-  const [isLoading, setIsLoading] = useState(false);
+  const signInMutation = useSignInMutation();
+  const googleAuthMutation = useGoogleAuthMutation();
+
+  const state = location.state as Nullable<LocationState>;
 
   const handleLoginSubmit = async (data: SignInLocalDto): Promise<boolean> => {
-    setIsLoading(true);
     try {
-      const requestConfig = authApiService.signIn(data);
-      const response = await httpClient<AuthResponse>(requestConfig);
-
+      const response = await signInMutation.mutateAsync(data);
       localStorageService.setAccessToken(response.data.accessToken);
-
-      const state = location.state as LocationState | null;
-      const from = state?.from?.pathname || AppRoutes.TASKS;
-      void navigate(from, { replace: true });
-
-      setIsLoading(false);
+      void navigate(state?.from?.pathname || AppRoutes.TASKS, { replace: true });
       return true;
-    } catch (error) {
-      handleApiError(error);
-
-      setIsLoading(false);
+    } catch (_error) {
       return false;
     }
   };
 
-  const handleGoogleAuth = async (credential: string): Promise<void> => {
-    try {
-      const requestConfig = authApiService.googleAuth({ credential });
-      const response = await httpClient<AuthResponse>(requestConfig);
-
-      localStorageService.setAccessToken(response.data.accessToken);
-
-      const state = location.state as LocationState | null;
-      const from = state?.from?.pathname || AppRoutes.TASKS;
-      void navigate(from, { replace: true });
-    } catch (error) {
-      handleApiError(error);
-    }
+  const handleGoogleAuth = (credential: string) => {
+    googleAuthMutation.mutate(credential, {
+      onSuccess: (response) => {
+        localStorageService.setAccessToken(response.data.accessToken);
+        void navigate(state?.from?.pathname || AppRoutes.TASKS, { replace: true });
+      },
+    });
   };
 
   return (
     <Box>
-      <LoginForm onSubmit={handleLoginSubmit} isLoading={isLoading} />
+      <LoginForm onSubmit={handleLoginSubmit} isLoading={signInMutation.isPending} />
       <Divider sx={{ my: 2 }} />
       <GoogleAuthButton
         onSuccess={(credential) => void handleGoogleAuth(credential)}
