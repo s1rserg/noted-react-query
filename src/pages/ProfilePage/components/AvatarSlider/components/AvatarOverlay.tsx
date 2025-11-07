@@ -10,8 +10,8 @@ interface Props {
   isMainAvatar: boolean;
   isLoading: boolean;
   onUpload: () => void;
-  onSetMain: () => Promise<void>;
-  onDelete: () => Promise<void>;
+  onSetMain: () => void;
+  onDelete: () => void;
 }
 
 export const AvatarOverlay: FC<Props> = ({

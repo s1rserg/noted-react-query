@@ -1,0 +1,1 @@
+export { getAllAvatarsQueryOptions } from './getAllAvatars';
