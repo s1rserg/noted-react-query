@@ -8,8 +8,9 @@ interface Props {
   avatars: UserAvatarMedia[];
   mainAvatarId: Nullable<number>;
   onUpload: () => void;
-  onSetMain: (mediaId: UserAvatarMedia['id']) => Promise<void>;
-  onDelete: (mediaId: UserAvatarMedia['id']) => Promise<void>;
+  onSetMain: (mediaId: UserAvatarMedia['id']) => void;
+  onDelete: (mediaId: UserAvatarMedia['id']) => void;
+  isLoading: boolean;
 }
 
 export const AvatarSlider: FC<Props> = ({
@@ -18,8 +19,8 @@ export const AvatarSlider: FC<Props> = ({
   onUpload,
   onSetMain,
   onDelete,
+  isLoading,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const sliderItems = avatars.map((a) => ({
@@ -32,24 +33,14 @@ export const AvatarSlider: FC<Props> = ({
   const currentItem = sliderItems[currentIndex];
   const isMain = currentItem?.id === mainAvatarId;
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!currentItem) return;
-    setIsLoading(true);
-    try {
-      await onDelete(currentItem.id);
-    } finally {
-      setIsLoading(false);
-    }
+    onDelete(currentItem.id);
   };
 
-  const handleSetMain = async () => {
+  const handleSetMain = () => {
     if (!currentItem) return;
-    setIsLoading(true);
-    try {
-      await onSetMain(currentItem.id);
-    } finally {
-      setIsLoading(false);
-    }
+    onSetMain(currentItem.id);
   };
 
   useEffect(() => {

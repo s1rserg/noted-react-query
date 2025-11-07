@@ -1,112 +1,70 @@
 import { Box } from '@mui/material';
 import { Loader } from 'components/Loader';
-import { useEffect, useState, type FC } from 'react';
-import { useUserStore } from 'store';
-import { useModal } from 'hooks';
-import {
-  handleApiError,
-  httpClient,
-  userApiService,
-  type UpdateUserDto,
-  type User,
-  type UserAvatarMedia,
-} from 'api';
-import { useTranslation } from 'react-i18next';
+import { type FC } from 'react';
+import { useGetUser, useModal, useUpdateProfileMutation } from 'hooks';
+import { type UpdateUserDto, type UserAvatarMedia } from 'api';
 import { AvatarSlider, UploadAvatarModal, UserData, UpdateProfileModal } from './components';
+import {
+  useDeleteAvatarMutation,
+  useGetAllAvatars,
+  useSetMainAvatarMutation,
+  useUploadAvatarMutation,
+} from './hooks';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export const ProfilePage: FC = () => {
   const { t } = useTranslation('profilePage');
 
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
-  const initUser = useUserStore((state) => state.initUser);
+  const { data: user, isLoading: isUserLoading } = useGetUser();
+  const { data: allAvatars = [], isLoading: areAvatarsLoading } = useGetAllAvatars();
+
   const {
     isOpen: isUploadModalOpen,
     openModal: openUploadModal,
     closeModal: closeUploadModal,
   } = useModal();
-
   const {
     isOpen: isUpdateModalOpen,
     openModal: openUpdateModal,
     closeModal: closeUpdateModal,
   } = useModal();
 
-  const [allAvatars, setAllAvatars] = useState<UserAvatarMedia[]>([]);
-  const [areAvatarsLoading, setAreAvatarsLoading] = useState(true);
-  const [isUpdateLoading, setIsUpdateLoading] = useState(false);
+  const { mutateAsync: updateUser, isPending: isUpdateLoading } = useUpdateProfileMutation();
+  const { mutateAsync: uploadAvatar } = useUploadAvatarMutation();
 
-  const fetchAvatars = async (signal?: AbortSignal) => {
-    setAreAvatarsLoading(true);
-    try {
-      const config = userApiService.getAllAvatars(signal);
-      const response = await httpClient<UserAvatarMedia[]>(config);
-      setAllAvatars(response.data);
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setAreAvatarsLoading(false);
-    }
-  };
+  const { mutate: setMainAvatar, isPending: isSettingMain } = useSetMainAvatarMutation();
+  const { mutate: deleteAvatar, isPending: isDeleting } = useDeleteAvatarMutation();
 
   const handleUpdateUserSubmit = async (data: UpdateUserDto): Promise<boolean> => {
-    setIsUpdateLoading(true);
     try {
-      const updatedUser = (await httpClient<User>(userApiService.updateProfile(data))).data;
-      setUser({ ...user, ...updatedUser });
-      toast.success(t('updateModal.successMsg'));
+      await updateUser(data);
       closeUpdateModal();
+      toast.success(t('updateModal.successMsg'));
       return true;
-    } catch (error) {
-      handleApiError(error);
+    } catch (_error) {
       return false;
-    } finally {
-      setIsUpdateLoading(false);
     }
   };
 
-  const handleUploadAvatar = async (file: File): Promise<void> => {
+  const handleUploadAvatar = async (file: File) => {
     try {
-      const avatar = (await httpClient<UserAvatarMedia>(userApiService.uploadAvatar(file))).data;
-      if (!user) return;
-      setUser({ ...user, avatar });
-      await fetchAvatars();
+      await uploadAvatar(file);
       closeUploadModal();
-    } catch (error) {
-      handleApiError(error);
+    } catch (_error) {
+      /* empty */
     }
   };
 
-  const handleSetMainAvatar = async (mediaId: UserAvatarMedia['id']) => {
-    try {
-      const avatar = (await httpClient<UserAvatarMedia>(userApiService.setMainAvatar(mediaId)))
-        .data;
-      if (!user) return;
-      setUser({ ...user, avatar });
-    } catch (error) {
-      handleApiError(error);
-    }
+  const handleSetMainAvatar = (mediaId: UserAvatarMedia['id']) => {
+    setMainAvatar(mediaId);
   };
 
-  const handleDeleteAvatar = async (mediaId: UserAvatarMedia['id']) => {
-    try {
-      await httpClient(userApiService.deleteAvatar(mediaId));
-      await initUser();
-      setAllAvatars((prev) => prev.filter((avatar) => avatar.id !== mediaId));
-    } catch (error) {
-      handleApiError(error);
-    }
+  const handleDeleteAvatar = (mediaId: UserAvatarMedia['id']) => {
+    deleteAvatar(mediaId);
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchAvatars(controller.signal);
-
-    return () => controller.abort();
-  }, []);
-
-  if (!user || areAvatarsLoading) {
+  if (isUserLoading || areAvatarsLoading || !user) {
     return <Loader />;
   }
 
@@ -119,6 +77,7 @@ export const ProfilePage: FC = () => {
           onUpload={openUploadModal}
           onSetMain={handleSetMainAvatar}
           onDelete={handleDeleteAvatar}
+          isLoading={isSettingMain || isDeleting}
         />
         <UserData user={user} openUpdateModal={openUpdateModal} />
       </Box>

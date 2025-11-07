@@ -3,8 +3,8 @@ import axios, { AxiosError, type AxiosResponse } from 'axios';
 import { localStorageService } from 'utils/LocalStorageService';
 import { authApiService, type AuthResponse } from '../services';
 import type { RetryableAxiosRequestConfig } from './types';
-import { useUserStore } from 'store';
 import { appRouter, AppRoutes } from 'routes';
+import { queryClient } from '../reactQuery';
 
 const httpClient = axios.create(ApiConfig);
 
@@ -34,7 +34,7 @@ httpClient.interceptors.response.use(
         return httpClient.request(originalRequest);
       } catch {
         localStorageService.deleteAccessToken();
-        useUserStore.getState().clearUser();
+        queryClient.clear();
         void appRouter.navigate(AppRoutes.LOGIN);
       }
     }
