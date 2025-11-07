@@ -16,7 +16,7 @@ import { toast } from 'react-toastify';
 
 interface Props {
   onSubmit: (authData: SignUpLocalDto) => Promise<boolean>;
-  onGoogleSubmit: (credential: string) => Promise<void>;
+  onGoogleSubmit: (credential: string) => void;
   isLoading: boolean;
 }
 
