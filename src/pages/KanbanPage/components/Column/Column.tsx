@@ -1,22 +1,21 @@
 import { Box, Divider, Typography, CircularProgress } from '@mui/material';
-import { type FC, useRef, useEffect } from 'react';
+import { type FC, useRef, useEffect, useCallback } from 'react';
 import type { Task } from 'types/task';
 import { Item } from '../Item';
 import { SortableContext } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableItem } from './components';
 import type { Nullable } from 'types/utils';
+import type { ColumnQuery } from './types';
 
 interface Props {
   id: string;
   title: string;
   tasks: Task[];
-  hasMore: boolean;
-  isLoadingMore: boolean;
-  onLoadMore: () => void;
+  query: ColumnQuery;
 }
 
-export const Column: FC<Props> = ({ id, title, tasks, hasMore, isLoadingMore, onLoadMore }) => {
+export const Column: FC<Props> = ({ id, title, tasks, query }) => {
   const { setNodeRef } = useDroppable({
     id: id,
     data: { columnId: id },
@@ -26,6 +25,15 @@ export const Column: FC<Props> = ({ id, title, tasks, hasMore, isLoadingMore, on
 
   const scrollableContainerRef = useRef<Nullable<HTMLDivElement>>(null);
   const observerRef = useRef<Nullable<HTMLDivElement>>(null);
+
+  const hasMore = query.hasNextPage ?? false;
+  const isLoadingMore = query.isFetchingNextPage;
+
+  const onLoadMore = useCallback(() => {
+    if (!isLoadingMore) {
+      void query.fetchNextPage();
+    }
+  }, [isLoadingMore, query]);
 
   useEffect(() => {
     const rootElement = scrollableContainerRef.current;

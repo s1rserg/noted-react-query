@@ -2,7 +2,7 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { Task } from 'types/task';
 import type { Nullable } from 'types/utils';
 import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core';
-import type { TasksByStatus } from '../../types';
+import type { ReorderVariables, TasksByStatus } from '../../types';
 import {
   findTaskStatus,
   getNextTaskId,
@@ -13,11 +13,7 @@ import {
 export const useKanbanDnd = (
   tasks: TasksByStatus,
   setTasks: Dispatch<SetStateAction<TasksByStatus>>,
-  handleReorderTask: (
-    id: Task['id'],
-    status: Task['status'],
-    nextTaskId: Nullable<Task['id']>,
-  ) => Promise<boolean>,
+  reorderTask: (variables: ReorderVariables) => Promise<Task>,
 ) => {
   const [activeTask, setActiveTask] = useState<Nullable<Task>>(null);
   const [originalTasks, setOriginalTasks] = useState<Nullable<TasksByStatus>>(null);
@@ -85,9 +81,14 @@ export const useKanbanDnd = (
 
     if (!hasMoved) return;
 
-    const ok = await handleReorderTask(activeId, finalStatus, finalNextTaskId);
-
-    if (!ok) {
+    try {
+      await reorderTask({
+        id: activeId,
+        status: finalStatus,
+        nextTaskId: finalNextTaskId,
+        oldStatus: originalStatus,
+      });
+    } catch (_error) {
       setTasks(pristineTasks);
     }
   };

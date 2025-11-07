@@ -6,9 +6,13 @@ import { TaskStatus, type Task } from 'types/task';
 
 const useInvalidateTasks = () => {
   const queryClient = useQueryClient();
+
   return async () =>
     queryClient.invalidateQueries({
-      queryKey: QueryKeys.tasks,
+      predicate: (query) => {
+        const key = query.queryKey;
+        return key.includes(QueryKeys.tasks[0]) || key.includes(QueryKeys.infiniteTasks[0]);
+      },
     });
 };
 
@@ -40,6 +44,7 @@ export const useUpdateTask = () => {
 export const useDeleteTask = () => {
   const queryKey = QueryKeys.tasks;
   const queryClient = useQueryClient();
+  const invalidateTasks = useInvalidateTasks();
   return useMutation({
     mutationFn: async (id: Task['id']) => {
       await httpClient(taskApiService.delete(id));
@@ -71,7 +76,7 @@ export const useDeleteTask = () => {
     },
 
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey });
+      await invalidateTasks();
     },
   });
 };
@@ -79,6 +84,7 @@ export const useDeleteTask = () => {
 export const useCompleteTask = () => {
   const queryKey = QueryKeys.tasks;
   const queryClient = useQueryClient();
+  const invalidateTasks = useInvalidateTasks();
   return useMutation({
     mutationFn: async (id: Task['id']) => {
       const data: UpdateTaskDto = { status: TaskStatus.COMPLETED };
@@ -114,7 +120,7 @@ export const useCompleteTask = () => {
     },
 
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey });
+      await invalidateTasks();
     },
   });
 };
